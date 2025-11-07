@@ -40,21 +40,21 @@ func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 // HandleGetAllCustomers handles the HTTP request to get all users
 func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
-	users, err := s.Query.GetCustomerByQuery()
+	items, err := s.Query.GetCustomerByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Failed to fetch users",
 		})
 	}
 
-	return c.JSON(users)
+	return c.JSON(items)
 }
 
 // HandleGetCustomerByID handles the HTTP request to get a user by ID
 func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	user, err := s.Query.GetCustomerByID(id)
+	item, err := s.Query.GetCustomerByID(id)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(404).JSON(fiber.Map{
@@ -66,7 +66,7 @@ func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(item)
 }
 
 // HandleUpdateCustomer handles the HTTP request to update a user

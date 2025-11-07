@@ -21,7 +21,7 @@ type Customer struct {
 }
 
 type CustomerDTO struct {
-	ID         primitive.ObjectID `json:"id"`
+	ID         primitive.ObjectID `bson:"_id" json:"id"`
 	FirstName  string             `json:"firstName"`
 	LastName   string             `json:"lastName"`
 	MiddleName string             `json:"middleName"`
