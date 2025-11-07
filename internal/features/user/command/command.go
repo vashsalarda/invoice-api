@@ -13,10 +13,10 @@ import (
 )
 
 type DefaultCommand struct{}
+
 func (c *DefaultCommand) CollectionName() string {
 	return "users"
 }
-
 
 type Command interface {
 	CreateUser(_val *model.CreateUser) (*mongo.InsertOneResult, error)
@@ -30,9 +30,13 @@ func (c *DefaultCommand) CreateUser(_val *model.CreateUser) (*mongo.InsertOneRes
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(_val.Password), bcrypt.DefaultCost)
 	user := &model.User{
-		Name:     _val.Name,
-		Email:    _val.Email,
-		Password: string(hashedPassword),
+		FirstName:  _val.FirstName,
+		LastName:   _val.LastName,
+		MiddleName: _val.MiddleName,
+		Email:      _val.Email,
+		Password:   string(hashedPassword),
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -55,9 +59,11 @@ func (c *DefaultCommand) UpdateUser(id string, val *model.UpdateUser) (*mongo.Up
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":     val.Name,
-			"email":    val.Email,
-			"password": val.Password,
+			"firstName":  val.FirstName,
+			"lastName":   val.LastName,
+			"middleName": val.MiddleName,
+			"email":      val.Email,
+			"updatedAt":  time.Now(),
 		},
 	}
 

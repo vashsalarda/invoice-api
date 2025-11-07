@@ -17,14 +17,18 @@ type UserController struct {
 // HandleCreateUser handles the HTTP request to create a user
 func (s *UserController) CreateUser(c *fiber.Ctx) error {
 	s.Command = &command.DefaultCommand{}
-	var user *model.CreateUser
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
+	
+	payload := new(model.CreateUser)
+	if err := c.BodyParser(payload); err != nil {
+		return c.Status(400).JSON(err.Error())
 	}
 
-	resp, err := s.Command.CreateUser(user)
+	validationErrors := model.ValidateStruct(payload)
+	if validationErrors != nil {
+		return c.Status(400).JSON(fiber.Map{"status": "error", "errors": validationErrors})
+	}
+
+	resp, err := s.Command.CreateUser(payload)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Failed to create user",
@@ -70,14 +74,16 @@ func (s *UserController) GetUserByID(c *fiber.Ctx) error {
 func (s *UserController) UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	var val *model.UpdateUser
-	if err := c.BodyParser(&val); err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
+	payload := new(model.UpdateUser)
+	if err := c.BodyParser(payload); err != nil {
+		return c.Status(400).JSON(err.Error())
 	}
 
-	res, err := s.Command.UpdateUser(id, val)
+	validationErrors := model.ValidateStruct(payload)
+	if validationErrors != nil {
+		return c.Status(400).JSON(fiber.Map{"status": "error", "errors": validationErrors})
+	}
+	res, err := s.Command.UpdateUser(id, payload)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(404).JSON(fiber.Map{

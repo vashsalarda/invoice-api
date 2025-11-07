@@ -1,22 +1,67 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"github.com/go-playground/validator"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+var validate = validator.New()
 
 type User struct {
-	ID       primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name     string             `json:"name" bson:"name"`
-	Email    string             `json:"email" bson:"email"`
-	Password string             `json:"password" bson:"password"`
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	FirstName  string             `bson:"firstName" json:"firstName"`
+	LastName   string             `bson:"lastName" json:"lastName"`
+	MiddleName string             `bson:"middleName" json:"middleName"`
+	Email      string             `bson:"email" json:"email"`
+	Password   string             `bson:"password" json:"password"`
+	CreatedAt  time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
+	UpdatedAt  time.Time          `bson:"updatedAt,omitempty" json:"updatedAt"`
+}
+
+type UserDTO struct {
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	FirstName  string             `bson:"firstName" json:"firstName"`
+	LastName   string             `bson:"lastName" json:"lastName"`
+	MiddleName string             `bson:"middleName" json:"middleName"`
+	Email      string             `bson:"email" json:"email"`
+	CreatedAt  time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt  time.Time          `bson:"updatedAt" json:"updatedAt,omitzero"`
 }
 
 type CreateUser struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	FirstName  string `json:"firstName" validate:"required"`
+	LastName   string `json:"lastName" validate:"required"`
+	MiddleName string `json:"middleName"`
+	Email      string `json:"email" validate:"required"`
+	Password   string `json:"password" validate:"required"`
 }
 
 type UpdateUser struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	MiddleName string `json:"middleName"`
+	Email      string `json:"email"`
+}
+
+type ErrorResponse struct {
+	Field string `json:"field"`
+	Tag   string `json:"tag"`
+	Value string `json:"value,omitempty"`
+}
+
+func ValidateStruct[T any](payload T) []ErrorResponse {
+	var errors []ErrorResponse
+	err := validate.Struct(payload)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element ErrorResponse
+			element.Field = err.StructNamespace()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, element)
+		}
+	}
+	return errors
 }

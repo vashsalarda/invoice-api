@@ -18,12 +18,12 @@ func (c *DefaultQuery) CollectionName() string {
 
 //go:generate mockgen -destination=../mocks/query/mock_pos_query.go -package=query shards.project-moonshot.com/ISAAC/go-inventory/features/pos/query PosQuery
 type Query interface {
-	GetAllByQuery() ([]model.User, error)
-	GetByID(id string) (*model.User, error)
+	GetAllByQuery() ([]model.UserDTO, error)
+	GetByID(id string) (*model.UserDTO, error)
 }
 
 // GetAllUsers executes the get all users query
-func (c *DefaultQuery) GetAllByQuery() ([]model.User, error) {
+func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
@@ -33,7 +33,7 @@ func (c *DefaultQuery) GetAllByQuery() ([]model.User, error) {
 	}
 	defer cursor.Close(context.TODO())
 
-	users := make([]model.User, 0, 100) 
+	users := make([]model.UserDTO, 0, 100) 
 	if err := cursor.All(context.TODO(), &users); err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *DefaultQuery) GetAllByQuery() ([]model.User, error) {
 }
 
 // GetUserByID executes the get user by ID query
-func (c *DefaultQuery) GetByID(id string) (*model.User, error) {
+func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 	
@@ -50,7 +50,7 @@ func (c *DefaultQuery) GetByID(id string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var user model.User
+	var user model.UserDTO
 	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
