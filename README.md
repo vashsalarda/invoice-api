@@ -12,55 +12,55 @@ invoice-api/
 │   └── main.go                          # Application entry point
 ├── internal/
 │   ├── server/
-│   │   ├── routes.go                    # Routes config
+│   │   ├── route.go                    # Routes config
 │   │   ├── server.go                    # Server config
 │   ├── database/
 │   │   └── database.go                  # MongoDB connection
 │   └── features/
-│       ├── users/
-│       │   ├── commands/
+│       ├── user/
+│       │   ├── command/
 │       │   │   └── command.go
-│       │   ├── queries/
-│       │   │   └── queries.go
-│       │   ├── handler.go
-│       │   │   └── handler.go
-│       │   ├── models/
-│       │   │   └── models.go
-│       │   └── routes/
-│       │       └── routes.go
-│       ├── customers/
-│       │   ├── commands/
+│       │   ├── query/
+│       │   │   └── query.go
+│       │   ├── controller/
+│       │   │   └── controller.go
+│       │   ├── model/
+│       │   │   └── model.go
+│       │   └── route/
+│       │       └── route.go
+│       ├── customer/
+│       │   ├── command/
 │       │   │   └── command.go
-│       │   ├── queries/
-│       │   │   └── queries.go
-│       │   ├── handler.go
-│       │   │   └── handler.go
-│       │   ├── models/
-│       │   │   └── models.go
-│       │   └── routes/
-│       │       └── routes.go
-│       ├── invoices/
-│       │   ├── commands/
+│       │   ├── query/
+│       │   │   └── query.go
+│       │   ├── controller/
+│       │   │   └── controller.go
+│       │   ├── model/
+│       │   │   └── model.go
+│       │   └── route/
+│       │       └── route.go
+│       ├── invoice/
+│       │   ├── command/
 │       │   │   └── command.go
-│       │   ├── queries/
-│       │   │   └── queries.go
-│       │   ├── handler.go
-│       │   │   └── handler.go
-│       │   ├── models/
-│       │   │   └── models.go
-│       │   └── routes/
-│       │       └── routes.go
+│       │   ├── query/
+│       │   │   └── query.go
+│       │   ├── controller/
+│       │   │   └── controller.go
+│       │   ├── model/
+│       │   │   └── model.go
+│       │   └── route/
+│       │       └── route.go
 │       └── revenue/
-│           ├── commands/
+│           ├── command/
 │           │   └── command.go
-│           ├── queries/
-│           │   └── queries.go
-│           ├── handler.go
-│           │   └── handler.go
-│           ├── models/
-│           │   └── models.go
-│           └── routes/
-│               └── routes.go
+│           ├── query/
+│           │   └── query.go
+│           ├── controller/
+│           │   └── controller.go
+│           ├── model/
+│           │   └── model.go
+│           └── route/
+│               └── route.go
 ├── .env                            # Environment varible
 ├── .gitignore                      # Git ignore
 ├── Dockerfile                      # Docker image

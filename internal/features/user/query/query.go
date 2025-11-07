@@ -31,14 +31,15 @@ func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer cursor.Close(context.TODO())
 
-	users := make([]model.UserDTO, 0, 100) 
-	if err := cursor.All(context.TODO(), &users); err != nil {
+	items := make([]model.UserDTO, 0, 100) 
+	if err := cursor.All(context.TODO(), &items); err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	return items, nil
 }
 
 // GetUserByID executes the get user by ID query
@@ -50,8 +51,9 @@ func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 	if err != nil {
 		return nil, err
 	}
-	var user model.UserDTO
-	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&user)
+
+	var items model.UserDTO
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&items)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, err
@@ -59,5 +61,5 @@ func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 		return nil, err
 	}
 
-	return &user, nil
+	return &items, nil
 }
