@@ -1,9 +1,12 @@
 package server
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 
 	"invoice-api/internal/database"
+	user_route "invoice-api/internal/features/user/route"
 )
 
 type FiberServer struct {
@@ -20,6 +23,21 @@ func New() *FiberServer {
 		}),
 
 		db: database.New(),
+	}
+
+	userRoute := new(user_route.UserRoute)
+
+	userRoute.Init(server.App)
+
+	// List all routes
+	log.Println("API Routes:")
+	routes := server.App.GetRoutes()
+	for _, route := range routes {
+		method := route.Method
+		path := route.Path
+		if method != "HEAD" {
+			log.Printf("%-6s %-20s\n", method, path)
+		}
 	}
 
 	return server

@@ -15,20 +15,20 @@ func (s *FiberServer) RegisterFiberRoutes() {
 		MaxAge:           300,
 	}))
 
-	s.App.Get("/", s.HelloWorldHandler)
+	s.App.Get("/", s.InvoiceAPIHandler)
 
-	s.App.Get("/health", s.healthHandler)
+	s.App.Get("/health", s.HealthHandler)
 
 }
 
-func (s *FiberServer) HelloWorldHandler(c *fiber.Ctx) error {
+func (s *FiberServer) InvoiceAPIHandler(c *fiber.Ctx) error {
 	resp := fiber.Map{
-		"message": "Hello World",
+		"message": "Invoice API",
 	}
 
 	return c.JSON(resp)
 }
 
-func (s *FiberServer) healthHandler(c *fiber.Ctx) error {
+func (s *FiberServer) HealthHandler(c *fiber.Ctx) error {
 	return c.JSON(s.db.Health())
 }

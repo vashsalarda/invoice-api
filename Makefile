@@ -1,49 +1,15 @@
-# Simple Makefile for a Go project
+build_linux:
+	go env -w CGO_ENABLED=0 GOOS=linux && \
+	go build -o invoice-api ./cmd/api
+build_windows:
+	go env -w  CGO_ENABLED=0 GOOS=windows GOARCH=amd64 && \
+	go build -o invoice-api.exe ./cmd/api
+build_mac_amd64:
+	go env -w CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 &&\
+	go build -o invoice-api-mac-amd64 ./cmd/api
+build_mac_arm64:
+	go env -w CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 && \
+	go build -o invoice-api-mac-arm64 ./cmd/api
 
-# Build the application
-all: build test
-
-build:
-	@echo "Building..."
-	
-	
-	@go build -o main.exe cmd/api/main.go
-
-# Run the application
-run:
-	@go run cmd/api/main.go
-# Create DB container
-docker-run:
-	@docker compose up --build
-
-# Shutdown DB container
-docker-down:
-	@docker compose down
-
-# Test the application
-test:
-	@echo "Testing..."
-	@go test ./... -v
-# Integrations Tests for the application
-itest:
-	@echo "Running integration tests..."
-	@go test ./internal/database -v
-
-# Clean the binary
-clean:
-	@echo "Cleaning..."
-	@rm -f main
-
-# Live Reload
-watch:
-	@powershell -ExecutionPolicy Bypass -Command "if (Get-Command air -ErrorAction SilentlyContinue) { \
-		air; \
-		Write-Output 'Watching...'; \
-	} else { \
-		Write-Output 'Installing air...'; \
-		go install github.com/air-verse/air@latest; \
-		air; \
-		Write-Output 'Watching...'; \
-	}"
-
-.PHONY: all build run test clean watch docker-run docker-down itest
+run_dev:
+	make build_linux && docker-compose build && docker-compose up
