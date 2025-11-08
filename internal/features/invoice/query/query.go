@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DefaultInvoiceQuery struct{}
@@ -28,7 +29,9 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery() ([]model.InvoiceDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
-	cursor, err := collection.Find(context.TODO(), bson.M{})
+	opts := options.Find()
+	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
+	cursor, err := collection.Find(context.TODO(), bson.M{}, opts)
 	if err != nil {
 		return nil, err
 	}
