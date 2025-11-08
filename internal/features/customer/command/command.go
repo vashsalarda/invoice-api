@@ -29,13 +29,11 @@ func (c *DefaultCommand) CreateCustomer(_val *model.CreateCustomer) (*mongo.Inse
 
 	imageURL := _val.ImageURL
 	if _val.ImageURL == "" {
-		imageURL = "https://placehold.co/250/93C5fd/fff/png?text=" + _val.FirstName[:1] + _val.LastName[:1]
+		imageURL = "https://placehold.co/250/93C5fd/fff/png?text=" + _val.Name[:1]
 	}
 
 	customer := &model.Customer{
-		FirstName:  _val.FirstName,
-		LastName:   _val.LastName,
-		MiddleName: _val.MiddleName,
+		Name:  _val.Name,
 		Email:      _val.Email,
 		ImageURL:   imageURL,
 		CreatedAt:  time.Now(),
@@ -61,9 +59,7 @@ func (c *DefaultCommand) UpdateCustomer(id string, _val *model.UpdateCustomer) (
 
 	update := bson.M{
 		"$set": bson.M{
-			"firstName":  _val.FirstName,
-			"lastName":   _val.LastName,
-			"middleName": _val.MiddleName,
+			"name":  _val.Name,
 			"imageUrl":   _val.ImageURL,
 			"updatedAt":  time.Now(),
 		},
