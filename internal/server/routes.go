@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func (s *FiberServer) RegisterFiberRoutes() {
@@ -13,6 +14,12 @@ func (s *FiberServer) RegisterFiberRoutes() {
 		AllowHeaders:     "Accept,Authorization,Content-Type",
 		AllowCredentials: false, // credentials require explicit origins
 		MaxAge:           300,
+	}))
+
+	s.App.Use(logger.New(logger.Config{
+		TimeFormat: "2006-01-02 15:04:05",
+		TimeZone:   "Asia/Singapore",
+		Format:     "${blue}[${time}] | ${green}${status} | ${cyan}${latency} | ${blue}${ip} | ${method} | ${white}${path} | ${red}${error}${white}\n",
 	}))
 
 	s.App.Get("/", s.InvoiceAPIHandler)
