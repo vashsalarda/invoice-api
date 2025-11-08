@@ -7,6 +7,7 @@ import (
 
 	"invoice-api/internal/database"
 	customer_route "invoice-api/internal/features/customer/route"
+	invoice_route "invoice-api/internal/features/invoice/route"
 	user_route "invoice-api/internal/features/user/route"
 )
 
@@ -30,6 +31,8 @@ func New() *FiberServer {
 	userRoute.Init(server.App)
 	customerRoute := new(customer_route.CustomerRoute)
 	customerRoute.Init(server.App)
+	invoiceRoute := new(invoice_route.InvoiceRoute)
+	invoiceRoute.Init(server.App)
 
 	// List all routes
 	log.Println("API Routes:")

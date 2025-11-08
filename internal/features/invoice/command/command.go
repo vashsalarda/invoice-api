@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 	"invoice-api/internal/database"
-	"invoice-api/internal/features/customer/model"
+	"invoice-api/internal/features/invoice/model"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,33 +11,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type DefaultCommand struct{}
+type DefaultInvoiceCommand struct{}
 
-func (c *DefaultCommand) CollectionName() string {
-	return "customers"
+func (c *DefaultInvoiceCommand) CollectionName() string {
+	return "invoices"
 }
 
-type Command interface {
-	CreateCustomer(_val *model.CreateCustomer) (*mongo.InsertOneResult, error)
-	UpdateCustomer(id string, _val *model.UpdateCustomer) (*mongo.UpdateResult, error)
-	DeleteCustomer(id string) (*mongo.DeleteResult, error)
+type InvoiceCommand interface {
+	CreateItem(_val *model.CreateInvoice) (*mongo.InsertOneResult, error)
+	UpdateItem(id string, _val *model.UpdateInvoice) (*mongo.UpdateResult, error)
+	DeleteItem(id string) (*mongo.DeleteResult, error)
 }
 
-func (c *DefaultCommand) CreateCustomer(_val *model.CreateCustomer) (*mongo.InsertOneResult, error) {
+func (c *DefaultInvoiceCommand) CreateItem(_val *model.CreateInvoice) (*mongo.InsertOneResult, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
-	imageURL := _val.ImageURL
-	if _val.ImageURL == "" {
-		imageURL = "https://placehold.co/250/93C5fd/fff/png?text=" + _val.FirstName[:1] + _val.LastName[:1]
+	customerID, err := primitive.ObjectIDFromHex(_val.CustomerID)
+	if err != nil {
+		return nil, err
 	}
-
-	customer := &model.Customer{
-		FirstName:  _val.FirstName,
-		LastName:   _val.LastName,
-		MiddleName: _val.MiddleName,
-		Email:      _val.Email,
-		ImageURL:   imageURL,
+	doc := &model.Invoice{
+		CustomerID: customerID,
+		Status:     _val.Status,
+		Amount:     _val.Amount,
+		Date:       _val.Date,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -45,7 +43,7 @@ func (c *DefaultCommand) CreateCustomer(_val *model.CreateCustomer) (*mongo.Inse
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	res, err := collection.InsertOne(ctx, customer)
+	res, err := collection.InsertOne(ctx, doc)
 	if err != nil {
 		return nil, err
 	}
@@ -53,18 +51,24 @@ func (c *DefaultCommand) CreateCustomer(_val *model.CreateCustomer) (*mongo.Inse
 	return res, nil
 }
 
-func (c *DefaultCommand) UpdateCustomer(id string, _val *model.UpdateCustomer) (*mongo.UpdateResult, error) {
+func (c *DefaultInvoiceCommand) UpdateItem(id string, _val *model.UpdateInvoice) (*mongo.UpdateResult, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	customerID, err := primitive.ObjectIDFromHex(_val.CustomerID)
+	if err != nil {
+		return nil, err
+	}
+
 	update := bson.M{
 		"$set": bson.M{
-			"firstName":  _val.FirstName,
-			"lastName":   _val.LastName,
-			"middleName": _val.MiddleName,
-			"imageUrl":   _val.ImageURL,
+			"customerID": customerID,
+			"status":     _val.Status,
+			"amount":     _val.Amount,
+			"date":     _val.Date,
 			"updatedAt":  time.Now(),
 		},
 	}
@@ -73,19 +77,21 @@ func (c *DefaultCommand) UpdateCustomer(id string, _val *model.UpdateCustomer) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := collection.UpdateOne(ctx, bson.M{"_id": objId}, update)
+
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": objId}, update)
 	if err != nil {
 		return nil, err
 	}
 
-	if res.MatchedCount == 0 {
+	if result.MatchedCount == 0 {
 		return nil, mongo.ErrNoDocuments
 	}
 
-	return res, nil
+	return result, nil
 }
 
-func (c *DefaultCommand) DeleteCustomer(id string) (*mongo.DeleteResult, error) {
+// DeleteInvoice executes the delete user command
+func (c *DefaultInvoiceCommand) DeleteItem(id string) (*mongo.DeleteResult, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
