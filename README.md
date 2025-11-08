@@ -155,7 +155,7 @@ curl -X POST http://localhost:3000/api/customers \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Simple Corporation",
-    "email": "contact@acme.com",
+    "email": "contact.simple.corporation@gmail.com",
     "imageUrl": "https://ui-avatars.com/api/?name=AC&background=8763C5&color=fff&size=150"
   }'
 ```
