@@ -30,31 +30,31 @@ func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 	resp, err := s.Command.CreateCustomer(payload)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to create user",
+			"error": "Failed to create customer",
 		})
 	}
 
 	return c.Status(201).JSON(resp)
 }
 
-// HandleGetAllCustomers handles the HTTP request to get all users
 func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
-	items, err := s.Query.GetCustomerByQuery()
+
+	items, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch users",
+			"error": "Failed to fetch customers",
 		})
 	}
 
 	return c.JSON(items)
 }
 
-// HandleGetCustomerByID handles the HTTP request to get a user by ID
 func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
+	s.Query = &query.DefaultQuery{}
 	id := c.Params("id")
 
-	item, err := s.Query.GetCustomerByID(id)
+	item, err := s.Query.GetItemByID(id)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(404).JSON(fiber.Map{
@@ -62,15 +62,15 @@ func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch user",
+			"error": "Failed to fetch customer",
 		})
 	}
 
 	return c.JSON(item)
 }
 
-// HandleUpdateCustomer handles the HTTP request to update a user
 func (s *CustomerController) UpdateCustomer(c *fiber.Ctx) error {
+	s.Command = &command.DefaultCommand{}
 	id := c.Params("id")
 
 	payload := new(model.UpdateCustomer)
@@ -90,13 +90,13 @@ func (s *CustomerController) UpdateCustomer(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update customer",
 		})
 	}
 
 	if res.ModifiedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update customer",
 		})
 	}
 
@@ -105,7 +105,6 @@ func (s *CustomerController) UpdateCustomer(c *fiber.Ctx) error {
 	})
 }
 
-// HandleDeleteCustomer handles the HTTP request to delete a user
 func (s *CustomerController) DeleteCustomer(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -117,13 +116,13 @@ func (s *CustomerController) DeleteCustomer(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update customer",
 		})
 	}
 
 	if res.DeletedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{
-			"error": "Failed to delete user",
+			"error": "Failed to delete customer",
 		})
 	}
 

@@ -30,7 +30,7 @@ func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	resp, err := s.Command.CreateItem(payload)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to create user",
+			"error": "Failed to create invoice",
 		})
 	}
 
@@ -39,20 +39,21 @@ func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 
 func (s *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
 	s.Query = &query.DefaultInvoiceQuery{}
-	users, err := s.Query.GetItemsByQuery()
+	items, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch users",
+			"error": "Failed to fetch invoices",
 		})
 	}
 
-	return c.JSON(users)
+	return c.JSON(items)
 }
 
 func (s *InvoiceController) GetInvoiceByID(c *fiber.Ctx) error {
+	s.Query = &query.DefaultInvoiceQuery{}
 	id := c.Params("id")
 
-	user, err := s.Query.GetItemByID(id)
+	item, err := s.Query.GetItemByID(id)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(404).JSON(fiber.Map{
@@ -60,14 +61,15 @@ func (s *InvoiceController) GetInvoiceByID(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch user",
+			"error": "Failed to fetch invoice",
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(item)
 }
 
 func (s *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
+	s.Command = &command.DefaultInvoiceCommand{}
 	id := c.Params("id")
 
 	payload := new(model.UpdateInvoice)
@@ -87,13 +89,13 @@ func (s *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update invoice",
 		})
 	}
 
 	if res.ModifiedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update invoice",
 		})
 	}
 
@@ -103,6 +105,7 @@ func (s *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
+	s.Command = &command.DefaultInvoiceCommand{}
 	id := c.Params("id")
 
 	res, err := s.Command.DeleteItem(id)
@@ -113,13 +116,13 @@ func (s *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
 			})
 		}
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to update user",
+			"error": "Failed to update invoice",
 		})
 	}
 
 	if res.DeletedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{
-			"error": "Failed to delete user",
+			"error": "Failed to delete invoice",
 		})
 	}
 
