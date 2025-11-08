@@ -141,8 +141,10 @@ go run ./cmd/api
 curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
+    "firstName": "John",
+    "lastName": "Wick",
+    "middleName": "D",
+    "email": "john.wick@example.com",
     "password": "password123"
   }'
 ```
@@ -152,7 +154,7 @@ curl -X POST http://localhost:3000/api/users \
 curl -X POST http://localhost:3000/api/customers \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Acme Corporation",
+    "name": "Simple Corporation",
     "email": "contact@acme.com",
     "imageUrl": "https://ui-avatars.com/api/?name=AC&background=8763C5&color=fff&size=150"
   }'
@@ -163,7 +165,7 @@ curl -X POST http://localhost:3000/api/customers \
 curl -X POST http://localhost:3000/api/invoices \
   -H "Content-Type: application/json" \
   -d '{
-    "customerId": "customer-uuid-here",
+    "customerId": "customer-id-string",
     "amount": 15000,
     "date": "2024-11-06",
     "status": "pending"
