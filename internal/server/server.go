@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"invoice-api/internal/database"
+	auth_route "invoice-api/internal/features/auth/route"
 	customer_route "invoice-api/internal/features/customer/route"
 	invoice_route "invoice-api/internal/features/invoice/route"
 	revenue_route "invoice-api/internal/features/revenue/route"
@@ -36,6 +37,8 @@ func New() *FiberServer {
 	invoiceRoute.Init(server.App)
 	revenueRoute := new(revenue_route.InvoiceRoute)
 	revenueRoute.Init(server.App)
+	authRoute := new(auth_route.AuthRoute)
+	authRoute.Init(server.App)
 
 	// List all routes
 	log.Println("API Routes:")

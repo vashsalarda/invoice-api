@@ -21,9 +21,9 @@ func (c *DefaultQuery) CollectionName() string {
 type Query interface {
 	GetAllByQuery() ([]model.UserDTO, error)
 	GetByID(id string) (*model.UserDTO, error)
+	GetByEmail(email string) (model.User, error)
 }
 
-// GetAllUsers executes the get all users query
 func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
@@ -45,7 +45,6 @@ func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
 	return items, nil
 }
 
-// GetUserByID executes the get user by ID query
 func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
@@ -65,4 +64,18 @@ func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 	}
 
 	return &items, nil
+}
+
+func (c *DefaultQuery) GetByEmail(email string) (model.User, error) {
+	db := database.GetDatabase()
+	collection := db.Collection(c.CollectionName())
+
+	var user model.User
+	err := collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&user)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

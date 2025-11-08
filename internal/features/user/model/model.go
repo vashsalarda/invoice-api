@@ -45,6 +45,30 @@ type UpdateUser struct {
 	Email      string `json:"email"`
 }
 
+type SignUp struct {
+	FirstName       string `json:"firstName" validate:"required"`
+	LastName        string `json:"lastName" validate:"required"`
+	Email           string `json:"email" validate:"required"`
+	Password        string `json:"password" validate:"required,min=8"`
+	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8"`
+}
+
+type SignIn struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+func FilterUserRecord(user *User) UserDTO {
+	return UserDTO{
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+}
+
 type ErrorResponse struct {
 	Field string `json:"field"`
 	Tag   string `json:"tag"`

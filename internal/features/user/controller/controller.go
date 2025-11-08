@@ -6,6 +6,7 @@ import (
 	"invoice-api/internal/features/user/query"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -16,6 +17,7 @@ type UserController struct {
 
 // HandleCreateUser handles the HTTP request to create a user
 func (s *UserController) CreateUser(c *fiber.Ctx) error {
+	s.Query = &query.DefaultQuery{}
 	s.Command = &command.DefaultCommand{}
 	
 	payload := new(model.CreateUser)
@@ -26,6 +28,11 @@ func (s *UserController) CreateUser(c *fiber.Ctx) error {
 	validationErrors := model.ValidateStruct(payload)
 	if validationErrors != nil {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "errors": validationErrors})
+	}
+
+	item, _ := s.Query.GetByEmail(payload.Email)
+	if item.ID != primitive.NilObjectID {
+		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already exists. Please select another email address"})
 	}
 
 	resp, err := s.Command.CreateUser(payload)

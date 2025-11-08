@@ -21,8 +21,8 @@ func (c *DefaultQuery) CollectionName() string {
 type Query interface {
 	GetItemsByQuery() ([]model.CustomerDTO, error)
 	GetItemByID(id string) (*model.CustomerDTO, error)
+	GetByEmail(email string) (model.CustomerDTO, error)
 }
-
 
 func (c *DefaultQuery) GetItemsByQuery() ([]model.CustomerDTO, error) {
 	db := database.GetDatabase()
@@ -69,4 +69,18 @@ func (c *DefaultQuery) GetItemByID(id string) (*model.CustomerDTO, error) {
 	}
 
 	return &item, nil
+}
+
+func (c *DefaultQuery) GetByEmail(email string) (model.CustomerDTO, error) {
+	db := database.GetDatabase()
+	collection := db.Collection(c.CollectionName())
+
+	var user model.CustomerDTO
+	err := collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&user)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

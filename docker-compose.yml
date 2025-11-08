@@ -1,12 +1,4 @@
 services:
-  # mongo_ia:
-  #   image: mongo:latest
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${DB_PORT}:27017"
-  #   volumes:
-  #     - mongo_volume_ia:/data/db
-
   invoice-api:
     image: ${DOCKER_REGISTRY-}invoice-api:v1
     build:
@@ -18,6 +10,3 @@ services:
       - DB_NAME=invoice_db
       - DB_CONNECTION=mongodb://username:password@mongodb:27017
       - DEPLOYED=true
-
-# volumes:
-#   mongo_volume_ia:
