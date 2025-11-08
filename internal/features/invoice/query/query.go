@@ -38,7 +38,7 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery() ([]model.InvoiceDTO, error) {
 
 	defer cursor.Close(context.TODO())
 
-	items := make([]model.InvoiceDTO, 0, 100) 
+	items := make([]model.InvoiceDTO, 0, 100)
 	if err := cursor.All(context.TODO(), &items); err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery() ([]model.InvoiceDTO, error) {
 func (c *DefaultInvoiceQuery) GetItemByID(id string) (*model.InvoiceDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
-	
+
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (c *DefaultInvoiceQuery) GetLatestInvoices() ([]model.LatestInvoice, error)
 				"name":     "$customer.name",
 				"imageUrl": "$customer.imageUrl",
 				"email":    "$customer.email",
-				"amount":   bson.M{"$toString": "$amount"},
+				"amount":   "$amount",
 			},
 		},
 	}
@@ -112,7 +112,7 @@ func (c *DefaultInvoiceQuery) GetLatestInvoices() ([]model.LatestInvoice, error)
 	}
 	defer cursor.Close(ctx)
 
-	resp := make([]model.LatestInvoice, 0, 100) 
+	resp := make([]model.LatestInvoice, 0, 100)
 	if err := cursor.All(ctx, &resp); err != nil {
 		return nil, err
 	}
