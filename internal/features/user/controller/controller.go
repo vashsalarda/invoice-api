@@ -32,7 +32,7 @@ func (s *UserController) CreateUser(c *fiber.Ctx) error {
 
 	item, _ := s.Query.GetByEmail(payload.Email)
 	if item.ID != primitive.NilObjectID {
-		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already exists. Please select another email address"})
+		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already taken. Please select another email address"})
 	}
 
 	resp, err := s.Command.CreateUser(payload)

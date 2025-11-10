@@ -2,7 +2,7 @@ package route
 
 import (
 	"invoice-api/internal/features/auth/controller"
-	"invoice-api/internal/middleware"
+	"invoice-api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )

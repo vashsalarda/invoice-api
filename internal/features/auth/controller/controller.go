@@ -40,7 +40,7 @@ func (s *AuthController) SignUpUser(c *fiber.Ctx) error {
 
 	user, err := s.Query.GetByEmail(payload.Email)
 	if user != (model.User{}) {
-		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already exists. Please select another email address"})
+		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already taken. Please select another email address"})
 	}
 
 	if err != nil {

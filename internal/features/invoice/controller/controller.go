@@ -132,6 +132,7 @@ func (s *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) GetLatestInvoices(c *fiber.Ctx) error {
+	s.Query = &query.DefaultInvoiceQuery{}
 	res, err := s.Query.GetLatestInvoices()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

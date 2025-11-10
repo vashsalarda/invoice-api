@@ -50,7 +50,7 @@ func (s *RevenueController) GetAllRevenues(c *fiber.Ctx) error {
 }
 
 func (s *RevenueController) GetRevenueByID(c *fiber.Ctx) error {
-	s.Command = &command.DefaultRevenueCommand{}
+	s.Query = &query.DefaultRevenueQuery{}
 	id := c.Params("id")
 
 	item, err := s.Query.GetItemByID(id)
