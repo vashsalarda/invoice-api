@@ -39,11 +39,10 @@ func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 
 func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
-
 	items, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch customers",
+			"error": err.Error(),
 		})
 	}
 

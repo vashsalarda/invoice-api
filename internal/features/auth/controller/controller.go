@@ -38,7 +38,7 @@ func (s *AuthController) SignUpUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Some fields are required. Please fill in the required fields", "errors": errors})
 	}
 
-	user, err := s.Query.GetByEmail(payload.Email)
+	user, err := s.Query.GetItemByEmail(payload.Email)
 	if user != (model.User{}) {
 		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already taken. Please select another email address"})
 	}
@@ -71,7 +71,7 @@ func (s *AuthController) SignInUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Some fields are required. Please fill in the required fields", "errors": errors})
 	}
 
-	user, err := s.Query.GetByEmail(payload.Email)
+	user, err := s.Query.GetItemByEmail(payload.Email)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"status": "fail", "message": "User not found"})
 	}
@@ -163,7 +163,7 @@ func (s *AuthController) GetUser(c *fiber.Ctx) error {
 
 	id := c.Params("id")
 
-	user, err := s.Query.GetByID(id)
+	user, err := s.Query.GetItemByID(id)
 
 	if user.ID.String() == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "User not found", "data": nil})

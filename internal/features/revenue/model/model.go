@@ -28,7 +28,7 @@ type RevenueDTO struct {
 type CreateRevenue struct {
 	Month   string  `json:"month" validate:"required"`
 	Year    string  `json:"year" validate:"required"`
-	Revenue float64 `json:"revenue" validate:"required"`
+	Revenue float64 `json:"revenue"`
 }
 
 type UpdateRevenue struct {

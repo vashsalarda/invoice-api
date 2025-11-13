@@ -79,7 +79,6 @@ func (c *DefaultRevenueCommand) UpdateItem(id string, _val *model.UpdateRevenue)
 	return result, nil
 }
 
-// DeleteRevenue executes the delete user command
 func (c *DefaultRevenueCommand) DeleteItem(id string) (*mongo.DeleteResult, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())

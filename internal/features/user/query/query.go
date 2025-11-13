@@ -19,12 +19,12 @@ func (c *DefaultQuery) CollectionName() string {
 
 //go:generate mockgen -destination=../mocks/query/mock_pos_query.go -package=query shards.project-moonshot.com/ISAAC/go-inventory/features/pos/query PosQuery
 type Query interface {
-	GetAllByQuery() ([]model.UserDTO, error)
-	GetByID(id string) (*model.UserDTO, error)
-	GetByEmail(email string) (model.User, error)
+	GetItemsByQuery() ([]model.UserDTO, error)
+	GetItemByID(id string) (*model.UserDTO, error)
+	GetItemByEmail(email string) (model.User, error)
 }
 
-func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
+func (c *DefaultQuery) GetItemsByQuery() ([]model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
@@ -45,7 +45,7 @@ func (c *DefaultQuery) GetAllByQuery() ([]model.UserDTO, error) {
 	return items, nil
 }
 
-func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
+func (c *DefaultQuery) GetItemByID(id string) (*model.UserDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 	
@@ -66,7 +66,7 @@ func (c *DefaultQuery) GetByID(id string) (*model.UserDTO, error) {
 	return &items, nil
 }
 
-func (c *DefaultQuery) GetByEmail(email string) (model.User, error) {
+func (c *DefaultQuery) GetItemByEmail(email string) (model.User, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 

@@ -15,7 +15,6 @@ type UserController struct {
 	Query             query.Query
 }
 
-// HandleCreateUser handles the HTTP request to create a user
 func (s *UserController) CreateUser(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
 	s.Command = &command.DefaultCommand{}
@@ -30,7 +29,7 @@ func (s *UserController) CreateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "errors": validationErrors})
 	}
 
-	item, _ := s.Query.GetByEmail(payload.Email)
+	item, _ := s.Query.GetItemByEmail(payload.Email)
 	if item.ID != primitive.NilObjectID {
 		return c.Status(409).JSON(fiber.Map{"status": "fail", "message": "The email address already taken. Please select another email address"})
 	}
@@ -45,10 +44,9 @@ func (s *UserController) CreateUser(c *fiber.Ctx) error {
 	return c.Status(201).JSON(resp)
 }
 
-// HandleGetAllUsers handles the HTTP request to get all users
 func (s *UserController) GetAllUsers(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
-	users, err := s.Query.GetAllByQuery()
+	users, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Failed to fetch users",
@@ -58,11 +56,10 @@ func (s *UserController) GetAllUsers(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-// HandleGetUserByID handles the HTTP request to get a user by ID
 func (s *UserController) GetUserByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	user, err := s.Query.GetByID(id)
+	user, err := s.Query.GetItemByID(id)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(404).JSON(fiber.Map{
@@ -77,7 +74,6 @@ func (s *UserController) GetUserByID(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-// HandleUpdateUser handles the HTTP request to update a user
 func (s *UserController) UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -113,7 +109,6 @@ func (s *UserController) UpdateUser(c *fiber.Ctx) error {
 	})
 }
 
-// HandleDeleteUser handles the HTTP request to delete a user
 func (s *UserController) DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 

@@ -42,7 +42,7 @@ func (s *RevenueController) GetAllRevenues(c *fiber.Ctx) error {
 	items, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to fetch revenues",
+			"error": err.Error(),
 		})
 	}
 

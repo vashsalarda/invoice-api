@@ -27,18 +27,18 @@ func (c *DefaultRevenueQuery) GetItemsByQuery() ([]model.RevenueDTO, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
 
+	items := make([]model.RevenueDTO, 0, 100) 
 	opts := options.Find()
-	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
+	opts.SetSort(bson.D{{Key: "createdAt", Value: 1}})
 	cursor, err := collection.Find(context.TODO(), bson.M{}, opts)
 	if err != nil {
-		return nil, err
+		return items, err
 	}
 
 	defer cursor.Close(context.TODO())
 
-	items := make([]model.RevenueDTO, 0, 100) 
 	if err := cursor.All(context.TODO(), &items); err != nil {
-		return nil, err
+		return items, err
 	}
 
 	return items, nil

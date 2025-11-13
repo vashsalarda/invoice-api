@@ -12,7 +12,7 @@ var validate = validator.New()
 type Invoice struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	CustomerID primitive.ObjectID `json:"customerId" bson:"customerId"`
-	Amount     float64              `json:"amount" bson:"amount"`
+	Amount     float64            `json:"amount" bson:"amount"`
 	Date       string             `json:"date" bson:"date"`
 	Status     string             `json:"status" bson:"status"`
 	CreatedAt  time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
@@ -22,7 +22,7 @@ type Invoice struct {
 type InvoiceDTO struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	CustomerID primitive.ObjectID `json:"customerId,omitzero" bson:"customerId"`
-	Amount     float64              `json:"amount" bson:"amount"`
+	Amount     float64            `json:"amount" bson:"amount"`
 	Date       string             `json:"date" bson:"date"`
 	Status     string             `json:"status" bson:"status"`
 	CreatedAt  time.Time          `json:"createdAt" bson:"createdAt"`
@@ -30,25 +30,25 @@ type InvoiceDTO struct {
 }
 
 type LatestInvoice struct {
-	ID       string `json:"id" bson:"_id"`
-	Name     string `json:"name" bson:"name"`
-	ImageURL string `json:"imageUrl" bson:"imageUrl"`
-	Email    string `json:"email" bson:"email"`
+	ID       string  `json:"id" bson:"_id"`
+	Name     string  `json:"name" bson:"name"`
+	ImageURL string  `json:"imageUrl" bson:"imageUrl"`
+	Email    string  `json:"email" bson:"email"`
 	Amount   float64 `json:"amount" bson:"amount"`
 }
 
 type CreateInvoice struct {
-	CustomerID string `json:"customerId" validate:"required"`
-	Amount     float64  `json:"amount" validate:"required"`
-	Date       string `json:"date" validate:"required"`
-	Status     string `json:"status"`
+	CustomerID string  `json:"customerId" validate:"required"`
+	Amount     float64 `json:"amount" validate:"required"`
+	Date       string  `json:"date" validate:"required"`
+	Status     string  `json:"status"`
 }
 
 type UpdateInvoice struct {
-	CustomerID string `json:"customerId"`
-	Amount     float64  `json:"amount"`
-	Date       string `json:"date"`
-	Status     string `json:"status"`
+	CustomerID string  `json:"customerId"`
+	Amount     float64 `json:"amount"`
+	Date       string  `json:"date"`
+	Status     string  `json:"status"`
 }
 
 type ErrorResponse struct {
