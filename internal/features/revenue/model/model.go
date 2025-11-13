@@ -19,7 +19,7 @@ type Revenue struct {
 }
 
 type RevenueDTO struct {
-	ID      primitive.ObjectID `json:"id"`
+	ID      primitive.ObjectID `bson:"_id" json:"id,,omitzero"`
 	Month   string             `json:"month"`
 	Year    string             `json:"year"`
 	Revenue float64            `json:"revenue"`
