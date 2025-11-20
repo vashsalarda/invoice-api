@@ -3,7 +3,9 @@ package query
 import (
 	"context"
 	"invoice-api/internal/database"
+	customer_model "invoice-api/internal/features/customer/model"
 	"invoice-api/internal/features/invoice/model"
+	"log"
 	"math"
 	"time"
 
@@ -30,6 +32,7 @@ type InvoiceQuery interface {
 func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, size int64, page int64) (*model.InvoicePage, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
+	customerCollection := db.Collection("customers")
 
 	var filter = bson.M{}
 	if keyword != "" {
@@ -73,6 +76,39 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, siz
 	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
+
+	customerIDs := make(map[primitive.ObjectID]primitive.ObjectID)
+	for _, item := range items {
+        customerIDs[item.CustomerID] = item.CustomerID
+    }
+
+	var customers []customer_model.CustomerDTO
+	if len(customerIDs) > 0 {
+        filter := bson.M{"_id": bson.M{"$in": getKeys(customerIDs)}}
+        cursor, err := customerCollection.Find(context.TODO(), filter)
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer cursor.Close(context.TODO())
+
+        if err = cursor.All(context.TODO(), &customers); err != nil {
+            log.Fatal(err)
+        }
+    }
+
+	// Create a map for faster Customer lookup
+    userMap := make(map[primitive.ObjectID]customer_model.CustomerDTO)
+    for _, customer := range customers {
+		userMap[customer.ID] = customer
+    }
+
+    // Populate Customer details in items(invoices)
+	for i, item := range items {
+        if customer, exists := userMap[item.CustomerID]; exists {
+            items[i].Customer = customer
+        }
+    }
+
 
 	resp := &model.InvoicePage{
 		TotalRows:  int64(len(items)),
@@ -186,4 +222,13 @@ func (c *DefaultInvoiceQuery) GetTotalItemsByQuery(keyword string, status string
 	}
 
 	return totalItems, nil
+}
+
+// Helper function to extract keys from a map
+func getKeys(m map[primitive.ObjectID]primitive.ObjectID) []primitive.ObjectID {
+    keys := make([]primitive.ObjectID, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+    return keys
 }

@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	customer_model "invoice-api/internal/features/customer/model"
+
 	"github.com/go-playground/validator"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -20,13 +22,14 @@ type Invoice struct {
 }
 
 type InvoiceDTO struct {
-	ID         primitive.ObjectID `json:"id" bson:"_id"`
-	CustomerID primitive.ObjectID `json:"customerId,omitzero" bson:"customerId"`
-	Amount     float64            `json:"amount" bson:"amount"`
-	Date       string             `json:"date" bson:"date"`
-	Status     string             `json:"status" bson:"status"`
-	CreatedAt  time.Time          `json:"createdAt" bson:"createdAt"`
-	UpdatedAt  time.Time          `json:"updatedAt,omitzero" bson:"updatedAt"`
+	ID         primitive.ObjectID         `json:"id" bson:"_id"`
+	CustomerID primitive.ObjectID         `json:"customerId,omitzero" bson:"customerId"`
+	Customer   customer_model.CustomerDTO `json:"customer,omitzero" bson:"customer"`
+	Amount     float64                    `json:"amount" bson:"amount"`
+	Date       string                     `json:"date" bson:"date"`
+	Status     string                     `json:"status" bson:"status"`
+	CreatedAt  time.Time                  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt  time.Time                  `json:"updatedAt,omitzero" bson:"updatedAt"`
 }
 
 type LatestInvoice struct {
