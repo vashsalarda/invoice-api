@@ -29,15 +29,23 @@ type CustomerDTO struct {
 }
 
 type CreateCustomer struct {
-	Name  string `json:"name" validate:"required"`
-	Email      string `json:"email" validate:"required"`
-	ImageURL   string `json:"imageUrl"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	ImageURL string `json:"imageUrl"`
 }
 
 type UpdateCustomer struct {
-	Name  string `json:"name"`
-	Email     string             `json:"email"`
-	ImageURL   string `json:"imageUrl"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	ImageURL string `json:"imageUrl"`
+}
+
+type CustomerPage struct {
+	PageSize   int64          `json:"page_size"`
+	PageNumber int64          `json:"page_number"`
+	TotalRows  int64          `json:"total_rows"`
+	TotalPages int64          `json:"total_pages"`
+	Data       []*CustomerDTO `json:"data"`
 }
 
 type ErrorResponse struct {

@@ -4,19 +4,21 @@ import (
 	"invoice-api/internal/features/invoice/command"
 	"invoice-api/internal/features/invoice/model"
 	"invoice-api/internal/features/invoice/query"
+	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type InvoiceController struct {
-	Command           command.InvoiceCommand
-	Query             query.InvoiceQuery
+	Command command.InvoiceCommand
+	Query   query.InvoiceQuery
 }
 
 func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	s.Command = &command.DefaultInvoiceCommand{}
-	
+
 	payload := new(model.CreateInvoice)
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -39,7 +41,19 @@ func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 
 func (s *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
 	s.Query = &query.DefaultInvoiceQuery{}
-	items, err := s.Query.GetItemsByQuery()
+	keyword := c.Query("keyword")
+	status := c.Query("status")
+	sizeStr := c.Query("size")
+	pageStr := c.Query("page")
+	size, err := strconv.ParseInt(sizeStr, 10, 64)
+	if err != nil {
+		size = 25
+	}
+	page, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil {
+		page = 1
+	}
+	items, err := s.Query.GetItemsByQuery(keyword, status, size, page)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -141,4 +155,25 @@ func (s *InvoiceController) GetLatestInvoices(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(res)
+}
+
+func (s *InvoiceController) GetTotalInvoices(c *fiber.Ctx) error {
+	s.Query = &query.DefaultInvoiceQuery{}
+	keyword := c.Query("keyword")
+	status := c.Query("status")
+	validStatus := map[string]bool{"pending": true, "paid": true, "cancelled": true, "void": true}
+	if status != "" {
+		status_check := strings.ToLower(status)
+		if !validStatus[status_check] {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Invalid status. Please select from `pending`, `paid`, `cancelled`, `void`",
+			})
+		}
+	}
+	items, err := s.Query.GetTotalItemsByQuery(keyword, status)
+	if err != nil {
+		return c.JSON(0)
+	}
+
+	return c.JSON(items)
 }

@@ -18,6 +18,7 @@ func (c *InvoiceRoute) Init(router *fiber.App) {
 	invoices.Get("/:id", controller.GetInvoiceByID)
 	invoices.Patch("/:id", controller.UpdateInvoice)
 	invoices.Delete("/:id", controller.DeleteInvoice)
+	router.Get("/invoices-total", controller.GetTotalInvoices)
 }
 
 	

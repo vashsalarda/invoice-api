@@ -51,6 +51,14 @@ type UpdateInvoice struct {
 	Status     string  `json:"status"`
 }
 
+type InvoicePage struct {
+	PageSize   int64         `json:"page_size"`
+	PageNumber int64         `json:"page_number"`
+	TotalRows  int64         `json:"total_rows"`
+	TotalPages int64         `json:"total_pages"`
+	Data       []*InvoiceDTO `json:"data"`
+}
+
 type ErrorResponse struct {
 	Field string `json:"field"`
 	Tag   string `json:"tag"`

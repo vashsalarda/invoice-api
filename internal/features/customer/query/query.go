@@ -4,6 +4,7 @@ import (
 	"context"
 	"invoice-api/internal/database"
 	"invoice-api/internal/features/customer/model"
+	"math"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,32 +20,64 @@ func (c *DefaultQuery) CollectionName() string {
 }
 
 type Query interface {
-	GetItemsByQuery() ([]model.CustomerDTO, error)
+	GetItemsByQuery(keyword string, size int64, page int64) (*model.CustomerPage, error)
 	GetItemByID(id string) (*model.CustomerDTO, error)
 	GetByEmail(email string) (model.CustomerDTO, error)
+	GetTotalItemsByQuery(keyword string) (int64, error)
 }
 
-func (c *DefaultQuery) GetItemsByQuery() ([]model.CustomerDTO, error) {
+func (c *DefaultQuery) GetItemsByQuery(keyword string, size int64, page int64) (*model.CustomerPage, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
+
+	var filter = bson.M{}
+	if keyword != "" {
+		filter["$or"] = bson.A{
+			bson.M{"name": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"middleName": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"email": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	items := make([]model.CustomerDTO, 0, 100)
-	opts := options.Find()
-	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
-	cursor, err := collection.Find(ctx, bson.M{}, opts)
+	totalItems, err := collection.CountDocuments(ctx, filter)
 	if err != nil {
-		return items, err
+		return nil, err
+	}
+	totalPages := int64(math.Ceil(float64(totalItems) / float64(page)))
+
+	items := make([]*model.CustomerDTO, 0, 100)
+	opts := new(options.FindOptions)
+	if size != 0 {
+		if page == 0 {
+			page = 1
+		}
+		opts.SetSkip(int64((page - 1) * size))
+		opts.SetLimit(int64(size))
+		opts.SetSort(bson.D{{Key: "_id", Value: -1}})
+	}
+
+	cursor, err := collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 
 	if err := cursor.All(ctx, &items); err != nil {
-		return items, err
+		return nil, err
 	}
 
-	return items, nil
+	resp := &model.CustomerPage{
+		TotalRows:  int64(len(items)),
+		TotalPages: totalPages,
+		PageNumber: page,
+		PageSize:   page,
+		Data:       items,
+	}
+
+	return resp, nil
 }
 
 func (c *DefaultQuery) GetItemByID(id string) (*model.CustomerDTO, error) {
@@ -83,4 +116,29 @@ func (c *DefaultQuery) GetByEmail(email string) (model.CustomerDTO, error) {
 	}
 
 	return user, nil
+}
+
+func (c *DefaultQuery) GetTotalItemsByQuery(keyword string) (int64, error) {
+	db := database.GetDatabase()
+	collection := db.Collection(c.CollectionName())
+
+	var filter = bson.M{}
+
+	if keyword != "" {
+		filter["$or"] = bson.A{
+			bson.M{"name": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"middleName": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"email": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	totalItems, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+
+	return totalItems, nil
 }

@@ -4,6 +4,7 @@ import (
 	"invoice-api/internal/features/customer/command"
 	"invoice-api/internal/features/customer/model"
 	"invoice-api/internal/features/customer/query"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -39,7 +40,18 @@ func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 
 func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
 	s.Query = &query.DefaultQuery{}
-	items, err := s.Query.GetItemsByQuery()
+	keyword := c.Query("keyword")
+	sizeStr := c.Query("size")
+	pageStr := c.Query("page")
+	size, err := strconv.ParseInt(sizeStr, 10, 64)
+	if err != nil {
+		size = 25
+	}
+	page, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil {
+		page = 1
+	}
+	items, err := s.Query.GetItemsByQuery(keyword, size, page)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -128,4 +140,15 @@ func (s *CustomerController) DeleteCustomer(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "Customer deleted successfully",
 	})
+}
+
+func (s *CustomerController) GetCustomersCount(c *fiber.Ctx) error {
+	s.Query = &query.DefaultQuery{}
+	keyword := c.Query("keyword")
+	total_items, err := s.Query.GetTotalItemsByQuery(keyword)
+	if err != nil {
+		return c.JSON(0)
+	}
+
+	return c.JSON(total_items)
 }
