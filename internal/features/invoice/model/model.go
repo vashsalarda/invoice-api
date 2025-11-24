@@ -12,24 +12,25 @@ import (
 var validate = validator.New()
 
 type Invoice struct {
-	ID         primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	CustomerID primitive.ObjectID `json:"customerId" bson:"customerId"`
-	Amount     float64            `json:"amount" bson:"amount"`
-	Date       string             `json:"date" bson:"date"`
-	Status     string             `json:"status" bson:"status"`
-	CreatedAt  time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
-	UpdatedAt  time.Time          `bson:"updatedAt,omitempty" json:"updatedAt"`
+	ID         primitive.ObjectID            `json:"id" bson:"_id,omitempty"`
+	CustomerID primitive.ObjectID            `json:"customerId" bson:"customerId"`
+	Customer   customer_model.CustomerDTOMin `json:"customer" bson:"customer"`
+	Amount     float64                       `json:"amount" bson:"amount"`
+	Date       string                        `json:"date" bson:"date"`
+	Status     string                        `json:"status" bson:"status"`
+	CreatedAt  time.Time                     `bson:"createdAt,omitempty" json:"createdAt"`
+	UpdatedAt  time.Time                     `bson:"updatedAt,omitempty" json:"updatedAt"`
 }
 
 type InvoiceDTO struct {
-	ID         primitive.ObjectID         `json:"id" bson:"_id"`
-	CustomerID primitive.ObjectID         `json:"customerId,omitzero" bson:"customerId"`
-	Customer   customer_model.CustomerDTO `json:"customer,omitzero" bson:"customer"`
-	Amount     float64                    `json:"amount" bson:"amount"`
-	Date       string                     `json:"date" bson:"date"`
-	Status     string                     `json:"status" bson:"status"`
-	CreatedAt  time.Time                  `json:"createdAt" bson:"createdAt"`
-	UpdatedAt  time.Time                  `json:"updatedAt,omitzero" bson:"updatedAt"`
+	ID         primitive.ObjectID            `bson:"_id" json:"id"`
+	CustomerID primitive.ObjectID            `json:"customerId,omitzero" bson:"customerId"`
+	Customer   customer_model.CustomerDTOMin `json:"customer"`
+	Amount     float64                       `json:"amount"`
+	Date       string                        `json:"date"`
+	Status     string                        `json:"status"`
+	CreatedAt  time.Time                     `json:"createdAt" bson:"createdAt"`
+	UpdatedAt  time.Time                     `json:"updatedAt,omitzero" bson:"updatedAt"`
 }
 
 type LatestInvoice struct {

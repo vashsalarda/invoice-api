@@ -12,7 +12,6 @@ var validate = validator.New()
 type Customer struct {
 	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name       string             `bson:"name" json:"name"`
-	MiddleName string             `bson:"middleName" json:"middleName"`
 	Email      string             `bson:"email" json:"email"`
 	ImageURL   string             `bson:"imageUrl" json:"imageUrl"`
 	CreatedAt  time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
@@ -26,6 +25,13 @@ type CustomerDTO struct {
 	ImageURL  string             `json:"imageUrl"`
 	CreatedAt time.Time          `json:"createdAt"`
 	UpdatedAt time.Time          `json:"updatedAt,omitzero"`
+}
+
+type CustomerDTOMin struct {
+	ID        primitive.ObjectID `bson:"_id" json:"id"`
+	Name      string             `json:"name"`
+	Email     string             `json:"email"`
+	ImageURL  string             `json:"imageUrl"`
 }
 
 type CreateCustomer struct {

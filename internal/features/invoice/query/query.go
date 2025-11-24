@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"invoice-api/internal/database"
-	customer_model "invoice-api/internal/features/customer/model"
 	"invoice-api/internal/features/invoice/model"
 	"log"
 	"math"
@@ -32,14 +31,13 @@ type InvoiceQuery interface {
 func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, size int64, page int64) (*model.InvoicePage, error) {
 	db := database.GetDatabase()
 	collection := db.Collection(c.CollectionName())
-	customerCollection := db.Collection("customers")
+	// customerCollection := db.Collection("customers")
 
 	var filter = bson.M{}
 	if keyword != "" {
 		filter["$or"] = bson.A{
-			bson.M{"name": bson.M{"$regex": keyword, "$options": "i"}},
-			bson.M{"middleName": bson.M{"$regex": keyword, "$options": "i"}},
-			bson.M{"email": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"customer.name": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"customer.email": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
 
@@ -67,6 +65,8 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, siz
 		opts.SetSort(bson.D{{Key: "_id", Value: -1}})
 	}
 
+	log.Printf("page: %d,  size: %d\n", page, size)
+
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
@@ -77,38 +77,37 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, siz
 		return nil, err
 	}
 
-	customerIDs := make(map[primitive.ObjectID]primitive.ObjectID)
-	for _, item := range items {
-        customerIDs[item.CustomerID] = item.CustomerID
-    }
+	// customerIDs := make(map[primitive.ObjectID]primitive.ObjectID)
+	// for _, item := range items {
+    //     customerIDs[item.CustomerID] = item.CustomerID
+    // }
 
-	var customers []customer_model.CustomerDTO
-	if len(customerIDs) > 0 {
-        filter := bson.M{"_id": bson.M{"$in": getKeys(customerIDs)}}
-        cursor, err := customerCollection.Find(context.TODO(), filter)
-        if err != nil {
-            log.Fatal(err)
-        }
-        defer cursor.Close(context.TODO())
+	// var customers []customer_model.CustomerDTOMin
+	// if len(customerIDs) > 0 {
+    //     filter := bson.M{"_id": bson.M{"$in": getKeys(customerIDs)}}
+    //     cursor, err := customerCollection.Find(context.TODO(), filter)
+    //     if err != nil {
+    //         log.Fatal(err)
+    //     }
+    //     defer cursor.Close(context.TODO())
 
-        if err = cursor.All(context.TODO(), &customers); err != nil {
-            log.Fatal(err)
-        }
-    }
+    //     if err = cursor.All(context.TODO(), &customers); err != nil {
+    //         log.Fatal(err)
+    //     }
+    // }
 
-	// Create a map for faster Customer lookup
-    userMap := make(map[primitive.ObjectID]customer_model.CustomerDTO)
-    for _, customer := range customers {
-		userMap[customer.ID] = customer
-    }
+	// // Create a map for faster Customer lookup
+    // userMap := make(map[primitive.ObjectID]customer_model.CustomerDTOMin)
+    // for _, customer := range customers {
+	// 	userMap[customer.ID] = customer
+    // }
 
-    // Populate Customer details in items(invoices)
-	for i, item := range items {
-        if customer, exists := userMap[item.CustomerID]; exists {
-            items[i].Customer = customer
-        }
-    }
-
+    // // Populate Customer details in items(invoices)
+	// for i, item := range items {
+    //     if customer, exists := userMap[item.CustomerID]; exists {
+    //         items[i].Customer = customer
+    //     }
+    // }
 
 	resp := &model.InvoicePage{
 		TotalRows:  int64(len(items)),

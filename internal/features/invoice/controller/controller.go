@@ -32,7 +32,7 @@ func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	resp, err := s.Command.CreateItem(payload)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "Failed to create invoice",
+			"error": "Failed to create invoice. " + err.Error(),
 		})
 	}
 
