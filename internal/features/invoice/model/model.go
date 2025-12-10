@@ -69,6 +69,16 @@ type ErrorResponse struct {
 	Value string `json:"value,omitempty"`
 }
 
+type InvoiceCustomers struct {
+	ID            string `bson:"_id" json:"id"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	ImageUrl      string `bson:"imageUrl" json:"imageUrl"`
+	TotalInvoices int64  `bson:"totalInvoices" json:"totalInvoices"`
+	TotalPending  int64  `bson:"totalPending" json:"totalPending"`
+	TotalPaid     int64  `bson:"totalPaid" json:"totalPaid"`
+}
+
 func ValidateStruct[T any](payload T) []ErrorResponse {
 	var errors []ErrorResponse
 	err := validate.Struct(payload)

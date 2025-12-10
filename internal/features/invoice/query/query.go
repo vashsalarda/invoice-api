@@ -26,6 +26,7 @@ type InvoiceQuery interface {
 	GetItemByID(id string) (*model.InvoiceDTO, error)
 	GetLatestInvoices() ([]model.LatestInvoice, error)
 	GetTotalItemsByQuery(keyword string, status string) (int64, error)
+	GetCustomersInvoices(keyword string) ([]model.InvoiceCustomers, error)
 }
 
 func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, size int64, page int64) (*model.InvoicePage, error) {
@@ -79,35 +80,35 @@ func (c *DefaultInvoiceQuery) GetItemsByQuery(keyword string, status string, siz
 
 	// customerIDs := make(map[primitive.ObjectID]primitive.ObjectID)
 	// for _, item := range items {
-    //     customerIDs[item.CustomerID] = item.CustomerID
-    // }
+	//     customerIDs[item.CustomerID] = item.CustomerID
+	// }
 
 	// var customers []customer_model.CustomerDTOMin
 	// if len(customerIDs) > 0 {
-    //     filter := bson.M{"_id": bson.M{"$in": getKeys(customerIDs)}}
-    //     cursor, err := customerCollection.Find(context.TODO(), filter)
-    //     if err != nil {
-    //         log.Fatal(err)
-    //     }
-    //     defer cursor.Close(context.TODO())
+	//     filter := bson.M{"_id": bson.M{"$in": getKeys(customerIDs)}}
+	//     cursor, err := customerCollection.Find(context.TODO(), filter)
+	//     if err != nil {
+	//         log.Fatal(err)
+	//     }
+	//     defer cursor.Close(context.TODO())
 
-    //     if err = cursor.All(context.TODO(), &customers); err != nil {
-    //         log.Fatal(err)
-    //     }
-    // }
+	//     if err = cursor.All(context.TODO(), &customers); err != nil {
+	//         log.Fatal(err)
+	//     }
+	// }
 
 	// // Create a map for faster Customer lookup
-    // userMap := make(map[primitive.ObjectID]customer_model.CustomerDTOMin)
-    // for _, customer := range customers {
+	// userMap := make(map[primitive.ObjectID]customer_model.CustomerDTOMin)
+	// for _, customer := range customers {
 	// 	userMap[customer.ID] = customer
-    // }
+	// }
 
-    // // Populate Customer details in items(invoices)
+	// // Populate Customer details in items(invoices)
 	// for i, item := range items {
-    //     if customer, exists := userMap[item.CustomerID]; exists {
-    //         items[i].Customer = customer
-    //     }
-    // }
+	//     if customer, exists := userMap[item.CustomerID]; exists {
+	//         items[i].Customer = customer
+	//     }
+	// }
 
 	resp := &model.InvoicePage{
 		TotalRows:  int64(len(items)),
@@ -223,11 +224,57 @@ func (c *DefaultInvoiceQuery) GetTotalItemsByQuery(keyword string, status string
 	return totalItems, nil
 }
 
-// Helper function to extract keys from a map
-func getKeys(m map[primitive.ObjectID]primitive.ObjectID) []primitive.ObjectID {
-    keys := make([]primitive.ObjectID, 0, len(m))
-    for k := range m {
-        keys = append(keys, k)
-    }
-    return keys
+func (c *DefaultInvoiceQuery) GetCustomersInvoices(keyword string) ([]model.InvoiceCustomers, error) {
+	db := database.GetDatabase()
+	collection := db.Collection(c.CollectionName())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{}
+
+	if keyword != "" {
+		filter["$or"] = []bson.M{
+			{"customerId": bson.M{"$regex": keyword, "$options": "i"}},
+			{"customer._id": bson.M{"$regex": keyword, "$options": "i"}},
+			{"customer.name": bson.M{"$regex": keyword, "$options": "i"}},
+			{"customer.email": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+
+	pipeline := []bson.M{
+		{"$match": filter },
+		{
+			"$group": bson.M{
+				"_id":           "$customer._id",
+				"name":          bson.M{"$first": "$customer.name"},
+				"email":         bson.M{"$first": "$customer.email"},
+				"imageUrl":      bson.M{"$first": "$customer.imageUrl"},
+				"totalInvoices": bson.M{"$sum": 1},
+				"totalPending":  bson.M{"$sum": bson.M{"$cond": bson.A{bson.M{"$eq": bson.A{"$status", "pending"}}, 1, 0}}},
+				"totalPaid":     bson.M{"$sum": bson.M{"$cond": bson.A{bson.M{"$eq": bson.A{"$status", "paid"}}, 1, 0}}},
+			},
+		},
+		{
+			"$sort": bson.M{"name": 1},
+		},
+	}
+
+	var totals = make([]model.InvoiceCustomers, 0, 100)
+		
+	// Execute the aggregation
+	cur, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(ctx)
+
+	curErr := cur.All(context.TODO(), &totals)
+	if curErr != nil {
+		return nil, curErr
+	}
+
+	return totals, nil
 }
+
+
