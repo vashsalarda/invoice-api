@@ -10,12 +10,12 @@ import (
 var validate = validator.New()
 
 type Customer struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name       string             `bson:"name" json:"name"`
-	Email      string             `bson:"email" json:"email"`
-	ImageURL   string             `bson:"imageUrl" json:"imageUrl"`
-	CreatedAt  time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
-	UpdatedAt  time.Time          `bson:"updatedAt,omitempty" json:"updatedAt"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Name      string             `bson:"name" json:"name"`
+	Email     string             `bson:"email" json:"email"`
+	ImageURL  string             `bson:"imageUrl" json:"imageUrl"`
+	CreatedAt time.Time          `bson:"createdAt,omitempty" json:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt"`
 }
 
 type CustomerDTO struct {
@@ -28,10 +28,10 @@ type CustomerDTO struct {
 }
 
 type CustomerDTOMin struct {
-	ID        primitive.ObjectID `bson:"_id" json:"id"`
-	Name      string             `json:"name"`
-	Email     string             `json:"email"`
-	ImageURL  string             `json:"imageUrl"`
+	ID       primitive.ObjectID `bson:"_id" json:"id"`
+	Name     string             `json:"name"`
+	Email    string             `json:"email"`
+	ImageURL string             `json:"imageUrl"`
 }
 
 type CreateCustomer struct {
@@ -52,6 +52,24 @@ type CustomerPage struct {
 	TotalRows  int64          `json:"total_rows"`
 	TotalPages int64          `json:"total_pages"`
 	Data       []*CustomerDTO `json:"data"`
+}
+
+type CustomerWithTotalPage struct {
+	PageSize   int64                   `json:"page_size"`
+	PageNumber int64                   `json:"page_number"`
+	TotalRows  int64                   `json:"total_rows"`
+	TotalPages int64                   `json:"total_pages"`
+	Data       []*CustomerWithTotalDTO `json:"data"`
+}
+
+type CustomerWithTotalDTO struct {
+	ID            primitive.ObjectID `bson:"_id" json:"id"`
+	Name          string             `json:"name"`
+	Email         string             `json:"email"`
+	ImageURL      string             `json:"imageUrl"`
+	TotalInvoices int64              `json:"totalInvoices"`
+	TotalPending  int64              `json:"totalPending"`
+	TotalPaid     int64              `json:"totalPaid"`
 }
 
 type ErrorResponse struct {

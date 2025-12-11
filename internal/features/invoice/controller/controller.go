@@ -178,13 +178,13 @@ func (s *InvoiceController) GetTotalInvoices(c *fiber.Ctx) error {
 	return c.JSON(items)
 }
 
-func (s *InvoiceController) GetCustomerInvoices(c *fiber.Ctx) error {
-	s.Query = &query.DefaultInvoiceQuery{}
-	keyword := c.Query("keyword")
-	items, err := s.Query.GetCustomersInvoices(keyword)
-	if err != nil {
-		return c.JSON(0)
-	}
+// func (s *InvoiceController) GetCustomerInvoices(c *fiber.Ctx) error {
+// 	s.Query = &query.DefaultInvoiceQuery{}
+// 	keyword := c.Query("keyword")
+// 	items, err := s.Query.GetCustomersInvoices(keyword)
+// 	if err != nil {
+// 		return c.JSON(0)
+// 	}
 
-	return c.JSON(items)
-}
+// 	return c.JSON(items)
+// }

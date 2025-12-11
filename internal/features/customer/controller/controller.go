@@ -11,13 +11,13 @@ import (
 )
 
 type CustomerController struct {
-	Command           command.Command
-	Query             query.Query
+	Command command.Command
+	Query   query.Query
 }
 
 func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 	s.Command = &command.DefaultCommand{}
-	
+
 	payload := new(model.CreateCustomer)
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -151,4 +151,28 @@ func (s *CustomerController) GetCustomersCount(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(total_items)
+}
+
+func (s *CustomerController) GetCustomersWithTotalByQuery(c *fiber.Ctx) error {
+	s.Query = &query.DefaultQuery{}
+	keyword := c.Query("keyword")
+	sizeStr := c.Query("size")
+	pageStr := c.Query("page")
+	size, err := strconv.ParseInt(sizeStr, 10, 64)
+	if err != nil {
+		size = 25
+	}
+	page, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil {
+		page = 1
+	}
+
+	res, err := s.Query.GetItemsWithTotalByQuery(keyword, size, page)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(res)
 }

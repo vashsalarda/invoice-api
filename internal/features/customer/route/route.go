@@ -18,4 +18,5 @@ func (c *CustomerRoute) Init(router *fiber.App) {
 	customers.Patch("/:id", controller.UpdateCustomer)
 	customers.Delete("/:id", controller.DeleteCustomer)
 	router.Get("/customers-total", controller.GetCustomersCount)
+	router.Get("/customers-with-total", controller.GetCustomersWithTotalByQuery)
 }
