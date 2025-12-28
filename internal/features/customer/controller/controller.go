@@ -16,7 +16,9 @@ type CustomerController struct {
 }
 
 func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
-	s.Command = &command.DefaultCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultCommand{}
+	}
 
 	payload := new(model.CreateCustomer)
 	if err := c.BodyParser(payload); err != nil {
@@ -39,7 +41,9 @@ func (s *CustomerController) CreateCustomer(c *fiber.Ctx) error {
 }
 
 func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
 	keyword := c.Query("keyword")
 	sizeStr := c.Query("size")
 	pageStr := c.Query("page")
@@ -62,7 +66,9 @@ func (s *CustomerController) GetAllCustomers(c *fiber.Ctx) error {
 }
 
 func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
 	id := c.Params("id")
 
 	item, err := s.Query.GetItemByID(id)
@@ -81,7 +87,9 @@ func (s *CustomerController) GetCustomerByID(c *fiber.Ctx) error {
 }
 
 func (s *CustomerController) UpdateCustomer(c *fiber.Ctx) error {
-	s.Command = &command.DefaultCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultCommand{}
+	}
 	id := c.Params("id")
 
 	payload := new(model.UpdateCustomer)
@@ -143,7 +151,9 @@ func (s *CustomerController) DeleteCustomer(c *fiber.Ctx) error {
 }
 
 func (s *CustomerController) GetCustomersCount(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
 	keyword := c.Query("keyword")
 	total_items, err := s.Query.GetTotalItemsByQuery(keyword)
 	if err != nil {
@@ -154,7 +164,9 @@ func (s *CustomerController) GetCustomersCount(c *fiber.Ctx) error {
 }
 
 func (s *CustomerController) GetCustomersWithTotalByQuery(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
 	keyword := c.Query("keyword")
 	sizeStr := c.Query("size")
 	pageStr := c.Query("page")
