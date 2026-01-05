@@ -15,7 +15,9 @@ type RevenueController struct {
 }
 
 func (s *RevenueController) CreateRevenue(c *fiber.Ctx) error {
-	s.Command = &command.DefaultRevenueCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultRevenueCommand{}
+	}
 	
 	payload := new(model.CreateRevenue)
 	if err := c.BodyParser(payload); err != nil {
@@ -38,7 +40,9 @@ func (s *RevenueController) CreateRevenue(c *fiber.Ctx) error {
 }
 
 func (s *RevenueController) GetAllRevenues(c *fiber.Ctx) error {
-	s.Query = &query.DefaultRevenueQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultRevenueQuery{}
+	}
 	items, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -50,7 +54,9 @@ func (s *RevenueController) GetAllRevenues(c *fiber.Ctx) error {
 }
 
 func (s *RevenueController) GetRevenueByID(c *fiber.Ctx) error {
-	s.Query = &query.DefaultRevenueQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultRevenueQuery{}
+	}
 	id := c.Params("id")
 
 	item, err := s.Query.GetItemByID(id)
@@ -69,7 +75,9 @@ func (s *RevenueController) GetRevenueByID(c *fiber.Ctx) error {
 }
 
 func (s *RevenueController) UpdateRevenue(c *fiber.Ctx) error {
-	s.Command = &command.DefaultRevenueCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultRevenueCommand{}
+	}
 	id := c.Params("id")
 
 	payload := new(model.UpdateRevenue)
@@ -105,7 +113,9 @@ func (s *RevenueController) UpdateRevenue(c *fiber.Ctx) error {
 }
 
 func (s *RevenueController) DeleteRevenue(c *fiber.Ctx) error {
-	s.Command = &command.DefaultRevenueCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultRevenueCommand{}
+	}
 	id := c.Params("id")
 
 	res, err := s.Command.DeleteItem(id)

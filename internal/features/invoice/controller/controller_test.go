@@ -100,7 +100,7 @@ func TestCreateInvoice_ValidationError(t *testing.T) {
     }
 }
 
-func TestCreateInvoice_BodyParserError(t *testing.T) {
+func TestCreateInvoice_InvalidPayloadError(t *testing.T) {
     app := fiber.New()
     ctrl := &InvoiceController{}
     app.Post("/invoices", ctrl.CreateInvoice)
