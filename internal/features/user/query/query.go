@@ -54,8 +54,8 @@ func (c *DefaultQuery) GetItemByID(id string) (*model.UserDTO, error) {
 		return nil, err
 	}
 
-	var items model.UserDTO
-	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&items)
+	var item model.UserDTO
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&item)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, err
@@ -63,7 +63,7 @@ func (c *DefaultQuery) GetItemByID(id string) (*model.UserDTO, error) {
 		return nil, err
 	}
 
-	return &items, nil
+	return &item, nil
 }
 
 func (c *DefaultQuery) GetItemByEmail(email string) (model.User, error) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -121,41 +122,6 @@ func (s *AuthController) LogoutUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success"})
 }
 
-// func (s *AuthController) GetUsers(c *fiber.Ctx) error {
-// 	if s.Query == nil {
-// 		s.Query = &query.DefaultQuery{}
-// 	}
-// 	keyword := c.Query("keyword")
-// 	kind := c.Query("kind")
-// 	sizeStr := c.Query("size")
-// 	pageStr := c.Query("page")
-// 	size, err := strconv.ParseInt(sizeStr, 10, 64)
-// 	if err != nil {
-// 		size = 25
-// 	}
-// 	page, err := strconv.ParseInt(pageStr, 10, 64)
-// 	if err != nil {
-// 		page = 1
-// 	}
-// 	totalItems, err := s.Query.CountDocuments(keyword, kind)
-// 	if err != nil {
-// 		return c.Status(400).SendString(err.Error())
-// 	}
-// 	items, err := s.Query.FindAll(keyword, kind, size, page)
-// 	if err != nil {
-// 		return c.Status(400).SendString(err.Error())
-// 	}
-
-// 	resp := model.UserPage{
-// 		PageNumber: page,
-// 		PageSize:   size,
-// 		TotalRows:  totalItems,
-// 		Docs:       items,
-// 	}
-
-// 	return c.Status(200).JSON(resp)
-// }
-
 func (s *AuthController) GetUser(c *fiber.Ctx) error {
 	if s.Query == nil {
 		s.Query = &query.DefaultQuery{}
@@ -165,13 +131,16 @@ func (s *AuthController) GetUser(c *fiber.Ctx) error {
 
 	user, err := s.Query.GetItemByID(id)
 
-	if user.ID.String() == "" {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "User not found", "data": nil})
-	}
-
 	if err != nil {
-		return c.Status(400).SendString(err.Error())
+		if err == mongo.ErrNoDocuments {
+			return c.Status(404).JSON(fiber.Map{
+				"error": "User not found",
+			})
+		}
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to fetch user",
+		})
 	}
 
-	return c.Status(200).JSON(user)
+	return c.JSON(user)
 }

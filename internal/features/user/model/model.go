@@ -21,7 +21,7 @@ type User struct {
 }
 
 type UserDTO struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	ID         primitive.ObjectID `bson:"_id" json:"id"`
 	FirstName  string             `bson:"firstName" json:"firstName"`
 	LastName   string             `bson:"lastName" json:"lastName"`
 	MiddleName string             `bson:"middleName" json:"middleName"`
