@@ -15,7 +15,7 @@ import (
 	modelpkg "invoice-api/internal/features/customer/model"
 )
 
-type commandMock struct {
+type mockCommand struct {
 	createRes *mongo.InsertOneResult
 	createErr error
 	updateRes *mongo.UpdateResult
@@ -24,15 +24,15 @@ type commandMock struct {
 	deleteErr error
 }
 
-func (m *commandMock) CreateCustomer(_val *modelpkg.CreateCustomer) (*mongo.InsertOneResult, error) {
+func (m *mockCommand) CreateCustomer(_val *modelpkg.CreateCustomer) (*mongo.InsertOneResult, error) {
 	return m.createRes, m.createErr
 }
 
-func (m *commandMock) UpdateCustomer(id string, _val *modelpkg.UpdateCustomer) (*mongo.UpdateResult, error) {
+func (m *mockCommand) UpdateCustomer(id string, _val *modelpkg.UpdateCustomer) (*mongo.UpdateResult, error) {
 	return m.updateRes, m.updateErr
 }
 
-func (m *commandMock) DeleteCustomer(id string) (*mongo.DeleteResult, error) {
+func (m *mockCommand) DeleteCustomer(id string) (*mongo.DeleteResult, error) {
 	return m.deleteRes, m.deleteErr
 }
 
@@ -40,7 +40,7 @@ func TestCreateCustomer_SuccessAndBadBody(t *testing.T) {
 	app := fiber.New()
 
 	// success case
-	mock := &commandMock{createRes: &mongo.InsertOneResult{InsertedID: primitive.NewObjectID()}, createErr: nil}
+	mock := &mockCommand{createRes: &mongo.InsertOneResult{InsertedID: primitive.NewObjectID()}, createErr: nil}
 	ctrl := &CustomerController{Command: mock}
 	app.Post("/", ctrl.CreateCustomer)
 
@@ -74,7 +74,7 @@ func TestDeleteCustomer_NotFoundAndSuccess(t *testing.T) {
 	app := fiber.New()
 
 	// Not found case
-	notFoundMock := &commandMock{deleteRes: nil, deleteErr: mongo.ErrNoDocuments}
+	notFoundMock := &mockCommand{deleteRes: nil, deleteErr: mongo.ErrNoDocuments}
 	ctrl := &CustomerController{Command: notFoundMock}
 	app.Delete("/:id", ctrl.DeleteCustomer)
 
@@ -84,7 +84,7 @@ func TestDeleteCustomer_NotFoundAndSuccess(t *testing.T) {
 	require.Equal(t, 404, resp.StatusCode)
 
 	// success case
-	succMock := &commandMock{deleteRes: &mongo.DeleteResult{DeletedCount: 1}, deleteErr: nil}
+	succMock := &mockCommand{deleteRes: &mongo.DeleteResult{DeletedCount: 1}, deleteErr: nil}
 	ctrl2 := &CustomerController{Command: succMock}
 	app2 := fiber.New()
 	app2.Delete("/:id", ctrl2.DeleteCustomer)
@@ -103,7 +103,7 @@ func TestDeleteCustomer_NotFoundAndSuccess(t *testing.T) {
 func TestUpdateCustomer_NotFoundAndSuccess(t *testing.T) {
 	// not found (err == mongo.ErrNoDocuments)
 	app := fiber.New()
-	notFoundMock := &commandMock{updateRes: nil, updateErr: mongo.ErrNoDocuments}
+	notFoundMock := &mockCommand{updateRes: nil, updateErr: mongo.ErrNoDocuments}
 	ctrl := &CustomerController{Command: notFoundMock}
 	app.Put("/:id", ctrl.UpdateCustomer)
 
@@ -116,7 +116,7 @@ func TestUpdateCustomer_NotFoundAndSuccess(t *testing.T) {
 	require.Equal(t, 404, resp.StatusCode)
 
 	// update success with ModifiedCount 1
-	succMock := &commandMock{updateRes: &mongo.UpdateResult{ModifiedCount: 1}, updateErr: nil}
+	succMock := &mockCommand{updateRes: &mongo.UpdateResult{ModifiedCount: 1}, updateErr: nil}
 	ctrl2 := &CustomerController{Command: succMock}
 	app2 := fiber.New()
 	app2.Put("/:id", ctrl2.UpdateCustomer)

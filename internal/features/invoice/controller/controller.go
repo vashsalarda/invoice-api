@@ -17,7 +17,9 @@ type InvoiceController struct {
 }
 
 func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
-	s.Command = &command.DefaultInvoiceCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultInvoiceCommand{}
+	}
 
 	payload := new(model.CreateInvoice)
 	if err := c.BodyParser(payload); err != nil {
@@ -40,7 +42,9 @@ func (s *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
-	s.Query = &query.DefaultInvoiceQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultInvoiceQuery{}
+	}
 	keyword := c.Query("keyword")
 	status := c.Query("status")
 	sizeStr := c.Query("size")
@@ -64,7 +68,9 @@ func (s *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) GetInvoiceByID(c *fiber.Ctx) error {
-	s.Query = &query.DefaultInvoiceQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultInvoiceQuery{}
+	}
 	id := c.Params("id")
 
 	item, err := s.Query.GetItemByID(id)
@@ -83,7 +89,9 @@ func (s *InvoiceController) GetInvoiceByID(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
-	s.Command = &command.DefaultInvoiceCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultInvoiceCommand{}
+	}
 	id := c.Params("id")
 
 	payload := new(model.UpdateInvoice)
@@ -119,7 +127,9 @@ func (s *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
-	s.Command = &command.DefaultInvoiceCommand{}
+	if s.Command == nil {
+		s.Command = &command.DefaultInvoiceCommand{}
+	}
 	id := c.Params("id")
 
 	res, err := s.Command.DeleteItem(id)
@@ -146,7 +156,9 @@ func (s *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) GetLatestInvoices(c *fiber.Ctx) error {
-	s.Query = &query.DefaultInvoiceQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultInvoiceQuery{}
+	}
 	res, err := s.Query.GetLatestInvoices()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -158,7 +170,9 @@ func (s *InvoiceController) GetLatestInvoices(c *fiber.Ctx) error {
 }
 
 func (s *InvoiceController) GetTotalInvoices(c *fiber.Ctx) error {
-	s.Query = &query.DefaultInvoiceQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultInvoiceQuery{}
+	}
 	keyword := c.Query("keyword")
 	status := c.Query("status")
 	validStatus := map[string]bool{"pending": true, "paid": true, "cancelled": true, "void": true}
