@@ -16,8 +16,12 @@ type UserController struct {
 }
 
 func (s *UserController) CreateUser(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
-	s.Command = &command.DefaultCommand{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
+	if s.Command == nil {
+		s.Command = &command.DefaultCommand{}
+	}
 	
 	payload := new(model.CreateUser)
 	if err := c.BodyParser(payload); err != nil {
@@ -45,7 +49,9 @@ func (s *UserController) CreateUser(c *fiber.Ctx) error {
 }
 
 func (s *UserController) GetAllUsers(c *fiber.Ctx) error {
-	s.Query = &query.DefaultQuery{}
+	if s.Query == nil {
+		s.Query = &query.DefaultQuery{}
+	}
 	users, err := s.Query.GetItemsByQuery()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
